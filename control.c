@@ -25,7 +25,8 @@ unsigned char *cmd_ptr;
 unsigned char report[REP_SIZE];
 volatile unsigned char report_i;
 
-
+#define ADC_REFERENCE 5.0
+#define ADC_RESOLUTION 65536
 char * adc0_data;
 char * adc1_data;
 char * adc2_data;
@@ -35,9 +36,9 @@ void control_init(void)
 {   
     signals_init();
 
-    adc0_data = calloc(6, sizeof(char));
-    adc1_data = calloc(6, sizeof(char));
-    adc2_data = calloc(6, sizeof(char));
+    adc0_data = calloc(10, sizeof(char));
+    adc1_data = calloc(10, sizeof(char));
+    adc2_data = calloc(10, sizeof(char));
 
     // TODO: Move to signals.c
     ADCSRA = (1 << ADEN) | (3 << ADPS0) | (1 << ADSC);
@@ -61,7 +62,8 @@ void control_proc(void)
     case CONTROL_READ_ADC0:
         if(ADCSRA & (1 << ADIF)) // Conversion is complete
         {
-            utoa(ADC, adc0_data, 10);
+            double data = ADC_REFERENCE / ADC_RESOLUTION * ADC;
+            dtostrf(data, 1, 5, adc0_data);
             control_state = CONTROL_READ_ADC1;
         }
         else control_state = CONTROL_READ_ADC0;
@@ -69,7 +71,8 @@ void control_proc(void)
     case CONTROL_READ_ADC1:
         if(ADCSRA & (1 << ADIF)) // Conversion is complete
         {
-            utoa(ADC, adc1_data, 10);
+            double data = ADC_REFERENCE / ADC_RESOLUTION * ADC;
+            dtostrf(data, 1, 5, adc1_data);
             control_state = CONTROL_READ_ADC2;
         }
         else control_state = CONTROL_READ_ADC1;
@@ -77,7 +80,8 @@ void control_proc(void)
     case CONTROL_READ_ADC2:
         if(ADCSRA & (1 << ADIF)) // Conversion is complete
         {
-            utoa(ADC, adc2_data, 10);
+            double data = ADC_REFERENCE / ADC_RESOLUTION * ADC;
+            dtostrf(data, 1, 5, adc2_data);
             control_state = CONTROL_STATE_IDLE;
         }
         else control_state = CONTROL_READ_ADC2;
