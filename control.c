@@ -68,14 +68,14 @@ void control_proc(void)
             //report[0] = REP_START;
             
             {
-                char * buffer = calloc(sizeof(char), 10);
+                char buffer [10];
                 unsigned char buffer_i;
                 
                 unsigned char adc_i;
                 
                 for (adc_i = 0, report_i = 0; adc_i < ADC_NUMBER; adc_i++)
                 {
-                    dtostrf(get_adc(adc_i), 1, 5, buffer);
+                    dtostrf(get_adc(adc_i), 1, 5, (char *) &buffer);
                     
                     for (buffer_i = 0; buffer[buffer_i] != REP_EOL;)
                     {
@@ -83,8 +83,7 @@ void control_proc(void)
                     }
                     
                     report[report_i++] = REP_DELIM;
-                }
-                free(buffer);
+                }                
                 
                 report[report_i++] = REP_LF;
                 report[report_i++] = REP_CR;

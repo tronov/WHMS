@@ -24,17 +24,17 @@
 #define Gin_PIN_N    PINA2
 
 // Output ports
-#define Uout_DDR     DDRB
-#define Uout_PORT    PORTB
-#define Uout_PIN     PINB
-#define Uout_PORT_N  PB0
-#define Uout_PIN_N   PINB0
+#define Uout_DDR     DDRD
+#define Uout_PORT    PORTD
+#define Uout_PIN     PIND
+#define Uout_PORT_N  PD5
+#define Uout_PIN_N   PIND5
 
-#define Rel_DDR      DDRB
-#define Rel_PORT     PORTB
-#define Rel_PIN      PINB
-#define Rel_PORT_N   PB1
-#define Rel_PIN_N    PINB1
+#define Rel_DDR      DDRD
+#define Rel_PORT     PORTD
+#define Rel_PIN      PIND
+#define Rel_PORT_N   PD4
+#define Rel_PIN_N    PIND4
 
 void ports_configure(void);
 
