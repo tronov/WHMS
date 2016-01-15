@@ -4,9 +4,10 @@
 // Settings
 #define USE_GLOBAL_TIMERS
 
-#define SEC     100    // Интервал системного таймера ~10 мс
-#define MIN     60 * SEC
-#define HOUR    60 * MIN
+#define MS      10L         // Интервал системного таймера ~0.1 мс
+#define SEC     1000 * MS
+#define MIN     60   * SEC
+#define HOUR    60   * MIN
 
 
 #define TIMER_UART      0

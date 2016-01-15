@@ -3,7 +3,7 @@
 
 #include "timers.h"
 
-#define ADC_TIMEOUT     (10L) // ~ 100 ms
+#define ADC_TIMEOUT     100 * MS
 #define ADC_NUMBER      3
 #define ADC_REFERENCE   5.0
 #define ADC_RESOLUTION  65536

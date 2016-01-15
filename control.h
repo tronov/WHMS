@@ -3,7 +3,7 @@
 
 #include "timer.h"
 
-#define REP_TIMEOUT  (1L * SEC)
+#define REP_TIMEOUT  (1 * SEC)
 
 
 
