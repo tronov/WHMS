@@ -1,8 +1,7 @@
-#include <avr/io.h>
-#include "signals.h"
-
 #ifndef PORTS_H_
 #define PORTS_H_
+
+#include <avr/io.h>
 
 // Input ports
 #define Uin_DDR      DDRA

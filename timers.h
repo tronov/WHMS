@@ -17,9 +17,10 @@
 
 #ifdef USE_GLOBAL_TIMERS
     #define GTIMER_ADC      0
-    #define GTIMER_UART     1
-    #define GTIMER_CONTROL  2
-    #define GTIMERS_NUMBER 	3
+    #define GTIMER_PWM      1
+    #define GTIMER_UART     2
+    #define GTIMER_CONTROL  3
+    #define GTIMERS_NUMBER 	4
 #endif
 
 void timers_init(void);

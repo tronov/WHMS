@@ -1,4 +1,5 @@
 #include "adc.h"
+#include "pwm.h"
 #include "uart.h"
 #include "control.h"
 
@@ -13,6 +14,7 @@ int main(void)
     messages_init();
 
     adc_init();
+    pwm_init();
     uart_init();
     control_init();
     
@@ -21,6 +23,7 @@ int main(void)
         timers_proc();
 
         adc_proc();
+        pwm_proc();
         uart_proc();
         control_proc();
         
