@@ -9,14 +9,17 @@
 
 // Состояния системы управления
 #define CONTROL_STATE_IDLE	    0   // Простой системы управления
-#define CONTROL_STATE_REPORT    1   // Передача состояния объектов управления
-#define CONTROL_STATE_EXECUTE   2   // Исполнение принятой команды управления
+#define CONTROL_STATE_PWM       1   // Управление ШИМ
+#define CONTROL_STATE_PWM_DELAY 2   // Задержка после изменения частоты ШИМ
+#define CONTROL_STATE_ADC       3   // Опрос АЦП
+#define CONTROL_STATE_REPORT    4   // Передача состояния объектов управления
+#define CONTROL_STATE_EXECUTE   5   // Исполнение принятой команды управления
 
 // Новое и предыдущее состояния системы управления
 unsigned char control_state, control_state_prev;
 
 // Объявление приватных функций
-void make_report(void);
+void send_report(void);
 
 // Указатель для работы с параметром - массивом команды
 unsigned char *cmd_ptr;
@@ -33,7 +36,7 @@ void control_init(void)
     control_state_prev  = CONTROL_STATE_IDLE;
     control_state = control_state_prev;
     
-    start_gtimer(GTIMER_CONTROL);
+    start_gtimer(GTIMER_CONTROL_REPORT);
 }
 
 void control_proc(void)
@@ -41,10 +44,29 @@ void control_proc(void)
     switch (control_state_prev)
     {
     case CONTROL_STATE_IDLE:
-        if(get_message(MSG_CONTROL_CMD_RCV))
+        if (get_message(MSG_CONTROL_CMD_RCV))
             control_state = CONTROL_STATE_EXECUTE;
-        else if(get_gtimer(GTIMER_CONTROL) >= REP_TIMEOUT)
+        else if (get_gtimer(GTIMER_CONTROL_REPORT) >= REP_TIMEOUT)
+            control_state = CONTROL_STATE_PWM;
+        break;
+    case CONTROL_STATE_PWM:
+        if (get_message(MSG_PWM_GROW_OK))
+            control_state = CONTROL_STATE_PWM_DELAY;
+        else if (get_message(MSG_PWM_MAX))
+        {
+            send_message(MSG_PWM_SET_MIN);
             control_state = CONTROL_STATE_REPORT;
+        }            
+        break;
+    case CONTROL_STATE_PWM_DELAY:
+        if (get_gtimer(GTIMER_CONTROL_PWM_ADC) >= PWM_TIMEOUT)
+            control_state = CONTROL_STATE_ADC;
+        break;
+    case CONTROL_STATE_ADC:
+        if (get_message(MSG_ADC_COMPLETE))
+        {
+            control_state = CONTROL_STATE_PWM;
+        }            
         break;
     case CONTROL_STATE_REPORT:
         control_state = CONTROL_STATE_IDLE;
@@ -60,12 +82,21 @@ void control_proc(void)
         switch (control_state)
         {
         case CONTROL_STATE_IDLE:
-            stop_gtimer(GTIMER_CONTROL);
-            start_gtimer(GTIMER_CONTROL);
+            stop_gtimer(GTIMER_CONTROL_REPORT);
+            start_gtimer(GTIMER_CONTROL_REPORT);
+            break;
+        case CONTROL_STATE_PWM:
+            send_message(MSG_PWM_GROW);
+            break;
+        case CONTROL_STATE_PWM_DELAY:
+            stop_gtimer(GTIMER_CONTROL_PWM_ADC);
+            start_gtimer(GTIMER_CONTROL_PWM_ADC);
+            break;
+        case CONTROL_STATE_ADC:
+            send_message(MSG_ADC_READ_0);
             break;
         case CONTROL_STATE_REPORT:
-            make_report();
-            send_message_w_param(MSG_UART_TX_START, (unsigned char *) &report);
+            send_report();
             break;
         case CONTROL_STATE_EXECUTE:        
             break;
@@ -77,26 +108,23 @@ void control_proc(void)
 }
 
 
-void make_report()
+void send_report()
 {
     char buffer [10];
     unsigned char buffer_i;
     
-    unsigned char adc_i;
+    report_i = 0;
     
-    for (adc_i = 0, report_i = 0; adc_i < ADC_NUMBER; adc_i++)
+    dtostrf(get_adc(), 1, 5, (char *) &buffer);
+        
+    for (buffer_i = 0; buffer[buffer_i] != REP_EOL;)
     {
-        dtostrf(get_adc(adc_i), 1, 5, (char *) &buffer);
-        
-        for (buffer_i = 0; buffer[buffer_i] != REP_EOL;)
-        {
-            report[report_i++] = buffer[buffer_i++];
-        }
-        
-        report[report_i++] = REP_DELIM;
+        report[report_i++] = buffer[buffer_i++];
     }
-    
+
     report[report_i++] = REP_LF;
     report[report_i++] = REP_CR;
     report[report_i++] = REP_EOL;
+    
+    send_message_w_param(MSG_UART_TX_START, (unsigned char *) &report);
 }
