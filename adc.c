@@ -40,7 +40,6 @@ void adc_proc()
     case ADC_STATE_READ_2:
         if (ADCSRA & (1 << ADIF)) // Conversion is complete
         {
-            // TODO: check for int truncate
             adc_data = ADC_REFERENCE / ADC_RESOLUTION * ADC;
             adc_state = ADC_STATE_IDLE;
         }

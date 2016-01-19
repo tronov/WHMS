@@ -8,12 +8,13 @@
 #include <stdlib.h>
 
 // Состояния системы управления
-#define CONTROL_STATE_IDLE	    0   // Простой системы управления
-#define CONTROL_STATE_PWM       1   // Управление ШИМ
-#define CONTROL_STATE_PWM_DELAY 2   // Задержка после изменения частоты ШИМ
-#define CONTROL_STATE_ADC       3   // Опрос АЦП
-#define CONTROL_STATE_REPORT    4   // Передача состояния объектов управления
-#define CONTROL_STATE_EXECUTE   5   // Исполнение принятой команды управления
+#define CONTROL_STATE_IDLE	        0   // Простой системы управления
+#define CONTROL_STATE_PWM           1   // Управление ШИМ
+#define CONTROL_STATE_PWM_DELAY     2   // Задержка после изменения частоты ШИМ
+#define CONTROL_STATE_ADC           3   // Опрос АЦП
+#define CONTROL_STATE_ADC_REPORT    4
+#define CONTROL_STATE_REPORT        5   // Передача состояния объектов управления
+#define CONTROL_STATE_EXECUTE       6   // Исполнение принятой команды управления
 
 // Новое и предыдущее состояния системы управления
 unsigned char control_state, control_state_prev;
@@ -65,8 +66,11 @@ void control_proc(void)
     case CONTROL_STATE_ADC:
         if (get_message(MSG_ADC_COMPLETE))
         {
-            control_state = CONTROL_STATE_PWM;
+            control_state = CONTROL_STATE_ADC_REPORT;
         }            
+        break;
+    case CONTROL_STATE_ADC_REPORT:
+        control_state = CONTROL_STATE_PWM;
         break;
     case CONTROL_STATE_REPORT:
         control_state = CONTROL_STATE_IDLE;
@@ -94,6 +98,9 @@ void control_proc(void)
             break;
         case CONTROL_STATE_ADC:
             send_message(MSG_ADC_READ_0);
+            break;
+        case CONTROL_STATE_ADC_REPORT:
+            send_report();
             break;
         case CONTROL_STATE_REPORT:
             send_report();

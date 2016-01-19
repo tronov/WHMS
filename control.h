@@ -3,9 +3,9 @@
 
 #include "timer.h"
 
-// Timeout in ticks (1 tick ~ 1 millisecond)
+// Timeout in ticks (1 tick ~ 0.1 millisecond)
 #define REP_TIMEOUT (1 * SEC)
-#define PWM_TIMEOUT 100
+#define PWM_TIMEOUT 100 * MS
 
 
 
