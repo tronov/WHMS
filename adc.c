@@ -73,8 +73,3 @@ void adc_proc()
     
     adc_state_prev = adc_state;
 }
-
-double get_adc()
-{
-    return adc_data;
-}

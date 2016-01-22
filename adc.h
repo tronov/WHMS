@@ -13,6 +13,4 @@ void adc_init(void);
 
 void adc_proc(void);
 
-double get_adc(void);
-
 #endif /* ADC_H_ */
