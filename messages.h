@@ -2,10 +2,10 @@
 #define MESSAGES_H_
 
 // Messages definitions
-#define MSG_ADC_READ_0          0   // Команда на чтение нулевого канала ЦАП
-#define MSG_ADC_READ_1          1   // Команда на чтение первого канала ЦАП
-#define MSG_ADC_READ_2          2   // Команда на чтение второго канала ЦАП
-#define MSG_ADC_COMPLETE        3   // Отчет о выполнении ЦАП
+#define MSG_ADC_GET_0           0   // Команда на чтение нулевого канала ЦАП
+#define MSG_ADC_GET_1           1   // Команда на чтение первого канала ЦАП
+#define MSG_ADC_GET_2           2   // Команда на чтение второго канала ЦАП
+#define MSG_ADC_GET_OK          3   // Отчет о выполнении ЦАП
 
 #define MSG_PWM_GROW            4
 #define MSG_PWM_SET_MIN         5
@@ -36,7 +36,7 @@ void send_message(unsigned char message);
 unsigned char get_message(unsigned char message);
 
 
-void send_message_w_param(unsigned char message, unsigned char *vp_parameter);
+void send_message_w_param(unsigned char message, void *vp_parameter);
 
 void *get_message_param(unsigned char message);
 

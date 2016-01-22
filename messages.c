@@ -56,7 +56,7 @@ unsigned char get_message(unsigned char message)
     return 0;
 }
 
-void send_message_w_param(unsigned char message, unsigned char *vp_parameter)
+void send_message_w_param(unsigned char message, void *vp_parameter)
 {
     if(messages_buffer[message].message == 0)
     {

@@ -64,7 +64,7 @@ void control_proc(void)
             control_state = CONTROL_STATE_ADC;
         break;
     case CONTROL_STATE_ADC:
-        if (get_message(MSG_ADC_COMPLETE))
+        if (get_message(MSG_ADC_GET_OK))
         {
             control_state = CONTROL_STATE_ADC_REPORT;
         }            
@@ -97,7 +97,7 @@ void control_proc(void)
             start_gtimer(GTIMER_CONTROL_PWM_ADC);
             break;
         case CONTROL_STATE_ADC:
-            send_message(MSG_ADC_READ_0);
+            send_message(MSG_ADC_GET_0);
             break;
         case CONTROL_STATE_ADC_REPORT:
             send_report();
@@ -122,7 +122,7 @@ void send_report()
     
     report_i = 0;
     
-    dtostrf(get_adc(), 1, 5, (char *) &buffer);
+    dtostrf( *((double *)get_message_param(MSG_ADC_GET_OK)), 1, 5, (char *) &buffer);
         
     for (buffer_i = 0; buffer[buffer_i] != REP_EOL;)
     {
