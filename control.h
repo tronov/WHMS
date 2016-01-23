@@ -5,7 +5,7 @@
 
 // Timeout in ticks (1 tick ~ 0.1 millisecond)
 #define REP_TIMEOUT (1 * SEC)
-#define PWM_TIMEOUT 100 * MS
+#define PWM_TIMEOUT (5 * MS)
 
 
 

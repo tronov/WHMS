@@ -14,7 +14,6 @@
 #define CONTROL_STATE_ADC           3   // Опрос АЦП
 #define CONTROL_STATE_ADC_REPORT    4
 #define CONTROL_STATE_REPORT        5   // Передача состояния объектов управления
-#define CONTROL_STATE_EXECUTE       6   // Исполнение принятой команды управления
 
 // Новое и предыдущее состояния системы управления
 unsigned char control_state, control_state_prev;
@@ -54,9 +53,7 @@ void control_proc(void)
     switch (control_state_prev)
     {
     case CONTROL_STATE_IDLE:
-        if (get_message(MSG_CONTROL_CMD_RCV))
-            control_state = CONTROL_STATE_EXECUTE;
-        else if (get_gtimer(GTIMER_CONTROL_REPORT) >= REP_TIMEOUT)
+        if (get_gtimer(GTIMER_CONTROL_REPORT) >= REP_TIMEOUT)
             control_state = CONTROL_STATE_PWM;
         break;
     case CONTROL_STATE_PWM:
@@ -90,9 +87,6 @@ void control_proc(void)
     case CONTROL_STATE_REPORT:
         control_state = CONTROL_STATE_IDLE;
         break;
-    case CONTROL_STATE_EXECUTE:
-        control_state = CONTROL_STATE_REPORT;
-        break;
     default: break;
     }
     
@@ -115,12 +109,10 @@ void control_proc(void)
             send_message(MSG_ADC_GET_0);
             break;
         case CONTROL_STATE_ADC_REPORT:
-            send_report();
+            //send_report();
             break;
         case CONTROL_STATE_REPORT:
             send_report();
-            break;
-        case CONTROL_STATE_EXECUTE:        
             break;
         default: break;
         }
