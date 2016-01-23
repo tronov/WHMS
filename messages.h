@@ -7,21 +7,17 @@
 #define MSG_ADC_GET_2           2   // Команда на чтение второго канала ЦАП
 #define MSG_ADC_GET_OK          3   // Отчет о выполнении ЦАП
 
-#define MSG_PWM_GROW            4
-#define MSG_PWM_SET_MIN         5
+#define MSG_PWM_SET             4
+#define MSG_PWM_SET_ERR         5
+#define MSG_PWM_SET_OK          6
 
-#define MSG_PWM_GROW_OK         6
-#define MSG_PWM_MAX             7
+#define MSG_UART_TX_START       7   // Сообщение для UART_TX: Начать передачу
+#define MSG_UART_TX_COMPL       8   //
+#define MSG_UART_RX_BYTE_RCV    9
+#define MSG_UART_TX_REARY       10   // Сообщение для CONTROL: UART готов к отправке отчета
+#define MSG_CONTROL_CMD_RCV     11  // Сообщение для CONTROL: Принята команда
 
-
-#define MSG_UART_TX_START       8   // Сообщение для UART_TX: Начать передачу
-#define MSG_UART_TX_COMPL       9   //
-#define MSG_UART_RX_BYTE_RCV    10
-#define MSG_UART_TX_REARY       11   // Сообщение для CONTROL: UART готов к отправке отчета
-#define MSG_CONTROL_CMD_RCV     11   // Сообщение для CONTROL: Принята команда
-
-#define MESSAGES_NUMBER         13
-
+#define MESSAGES_NUMBER         12
 
 #define BROADCAST_MESSAGES_NUMBER   0
 

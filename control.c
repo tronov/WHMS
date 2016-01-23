@@ -19,8 +19,15 @@
 // Ќовое и предыдущее состо€ни€ системы управлени€
 unsigned char control_state, control_state_prev;
 
+// ќбъ€вление приватных констант
+#define CONTROL_PWM_MIN     0
+#define CONTROL_PWM_MAX     255
+
 // ќбъ€вление приватных функций
 void send_report(void);
+
+// ќбъ€вление приватных переменных
+unsigned int control_pwm;
 
 // ”казатель дл€ работы с параметром - массивом команды
 unsigned char *cmd_ptr;
@@ -33,6 +40,8 @@ volatile unsigned char report_i;
 void control_init(void)
 {
     ports_configure();
+    
+    control_pwm = CONTROL_PWM_MIN;
     
     control_state_prev  = CONTROL_STATE_IDLE;
     control_state = control_state_prev;
@@ -51,13 +60,19 @@ void control_proc(void)
             control_state = CONTROL_STATE_PWM;
         break;
     case CONTROL_STATE_PWM:
-        if (get_message(MSG_PWM_GROW_OK))
-            control_state = CONTROL_STATE_PWM_DELAY;
-        else if (get_message(MSG_PWM_MAX))
+        if (get_message(MSG_PWM_SET_OK))
         {
-            send_message(MSG_PWM_SET_MIN);
-            control_state = CONTROL_STATE_REPORT;
-        }            
+            if (control_pwm < CONTROL_PWM_MAX) control_pwm++;
+            else control_pwm = CONTROL_PWM_MIN;
+            
+            control_state = CONTROL_STATE_PWM_DELAY;
+        }
+        else if (get_message(MSG_PWM_SET_ERR))
+        {
+            control_pwm = CONTROL_PWM_MIN;
+            
+            control_state = CONTROL_STATE_PWM_DELAY;
+        }
         break;
     case CONTROL_STATE_PWM_DELAY:
         if (get_gtimer(GTIMER_CONTROL_PWM_ADC) >= PWM_TIMEOUT)
@@ -90,7 +105,7 @@ void control_proc(void)
             start_gtimer(GTIMER_CONTROL_REPORT);
             break;
         case CONTROL_STATE_PWM:
-            send_message(MSG_PWM_GROW);
+            send_message_w_param(MSG_PWM_SET, &control_pwm);
             break;
         case CONTROL_STATE_PWM_DELAY:
             stop_gtimer(GTIMER_CONTROL_PWM_ADC);

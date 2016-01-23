@@ -9,16 +9,15 @@
 
 // Состояния ШИМ
 #define PWM_STATE_FIX   0   // Поддержание установленной частоты ШИМ
-#define PWM_STATE_MIN   1   // Установление миниимальной частоты ШИМ
-#define PWM_STATE_GROW  2   // Увеличение частоты ШИМ
+#define PWM_STATE_SET   1   // Установление частоты ШИМ
 
 // Новое и предыдущее состояния системы управления
 unsigned char pwm_state, pwm_state_prev;
 
 void pwm_init()
 {
-    TCCR1A = (3 << COM1A0)  // Прямой ШИМ на канале 1A
-           | (3 << COM1B0)  // Прямой ШИМ на канале 1B
+    TCCR1A = (3 << COM1A0)  // Обратный ШИМ на канале 1A
+           | (3 << COM1B0)  // Обратный ШИМ на канале 1B
            | (0 << WGM11)   //
            | (1 << WGM10);  //
            
@@ -26,7 +25,7 @@ void pwm_init()
     
     OCR1A = PWM_MIN;
     
-    pwm_state_prev = PWM_STATE_MIN;
+    pwm_state_prev = PWM_STATE_FIX;
     pwm_state = pwm_state_prev;
 }
 
@@ -35,11 +34,10 @@ void pwm_proc()
     switch (pwm_state_prev)
     {
     case PWM_STATE_FIX:
-        if (get_message(MSG_PWM_GROW)) pwm_state = PWM_STATE_GROW;
-        else if (get_message(MSG_PWM_SET_MIN)) pwm_state = PWM_STATE_MIN;
+        if (get_message(MSG_PWM_SET)) pwm_state = PWM_STATE_SET;
+        else if (get_message(MSG_PWM_SET_OK)) pwm_state = PWM_STATE_SET;
         break;
-    case PWM_STATE_MIN:
-    case PWM_STATE_GROW:
+    case PWM_STATE_SET:
         pwm_state = PWM_STATE_FIX;
         break;
     default: break;
@@ -51,20 +49,20 @@ void pwm_proc()
         {
         case PWM_STATE_FIX:
             break;
-        case PWM_STATE_MIN:
-            OCR1A = PWM_MIN;
-            break;
-        case PWM_STATE_GROW:
-            if (OCR1A < PWM_MAX)
+        case PWM_STATE_SET:
             {
-                OCR1A++;
-                send_message(MSG_PWM_GROW_OK);
+                unsigned int param = *((unsigned int *) get_message_param(MSG_PWM_SET));
+                if (param <= PWM_MAX && param >= PWM_MIN)
+                {
+                    OCR1A = param;
+                    send_message(MSG_PWM_SET_OK);
+                }
+                else send_message(MSG_PWM_SET_ERR);
             }
-            else send_message(MSG_PWM_MAX);
             break;
         default: break;
         }
+        
+        pwm_state_prev = pwm_state;
     }
-    
-    pwm_state_prev = pwm_state;
 }
