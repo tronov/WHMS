@@ -11,6 +11,6 @@ void ports_configure()
     Gin_DDR  &= ~(1 << Gin_PIN_N);
 
     // Configure output ports
-    Uout_DDR |=  1 << Uout_PIN_N;
-    Rel_DDR  |=  1 << Rel_PIN_N;
+    Uout_DDR |=  1 << Uout_PORT_N;
+    Rel_DDR  |=  1 << Rel_PORT_N;
 }

@@ -32,8 +32,8 @@
 #define Rel_DDR      DDRD
 #define Rel_PORT     PORTD
 #define Rel_PIN      PIND
-#define Rel_PORT_N   PD4
-#define Rel_PIN_N    PIND4
+#define Rel_PORT_N   PD6
+#define Rel_PIN_N    PIND6
 
 void ports_configure(void);
 
