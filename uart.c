@@ -5,7 +5,6 @@
 
 #include "messages.h"
 
-#include "uart_rx.h"
 #include "uart_tx.h"
 
 #include "control.h"
@@ -30,13 +29,11 @@ void uart_init()
         
     sei();
     
-    uart_rx_init();
     uart_tx_init();
 }
 
 void uart_proc()
 {
-    uart_rx_proc();
     uart_tx_proc();
 }
 

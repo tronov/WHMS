@@ -31,7 +31,7 @@ unsigned char control_state, control_state_prev;
 #define CONTROL_PWM_MIN         0
 #define CONTROL_PWM_MAX         255
 // Минимальный модуль тангенса угла наклона касательной вольт-амперной характеристики (порог чувствительности)
-#define CONTROL_I_TG_ABS_MIN    0.01
+#define CONTROL_I_TG_ABS_MIN    1.0
 // Timeout in ticks (1 tick ~ 0.1 millisecond)
 #define CONTROL_TIMEOUT         (1 * SEC)   // Тайм-аут запуска измерений
 #define CONTROL_TIMEOUT_R_ON    (100 * MS)  // Тайм-аут переходных процессов после подачи напряжения на реле
@@ -57,10 +57,9 @@ unsigned int control_pwm;
 volatile double control_g,
                 control_u,
                 control_i;
-volatile struct Point3 control_point3_prev;
-struct Point3 control_report_data [CONTROL_RUSHES_MAX];
+
+volatile struct Point3 control_report_data [CONTROL_RUSHES_MAX];
 volatile unsigned char control_report_data_i = 0;
-volatile unsigned char is_in_rush = 0;  // Флаг участка броска тока
 
 
 // Объявление приватных функций
@@ -124,7 +123,7 @@ void control_proc(void)
             control_state = CONTROL_STATE_RESET_PWM;
         break;
     case CONTROL_STATE_PWM_TIMEOUT:
-        if (get_gtimer(GTIMER_CONTROL_PWM))
+        if (get_gtimer(GTIMER_CONTROL_PWM) > CONTROL_TIMEOUT_PWM)
             control_state = CONTROL_STATE_GET_U;
         break;
     case CONTROL_STATE_GET_U:
@@ -199,14 +198,14 @@ void control_proc(void)
             send_message(MSG_ADC_GET_1);
             break;
         case CONTROL_STATE_CALCULATE:
-            //make_calculations();
+            make_calculations();
             break;
         case CONTROL_STATE_RESET_PWM:
             control_pwm = CONTROL_PWM_MIN;
             send_message_w_param(MSG_PWM_SET, &control_pwm);
             break;
         case CONTROL_STATE_REPORT:
-            send_report();
+            //send_report();
             break;
         default: break;
         }
@@ -268,7 +267,7 @@ struct Point3 get_derivative(struct Point2 p)
                            d3y1 = 0, d3y2 = 0,
                            d4y1 = 0;
     
-    struct Point3 result = {x1, y1, y_derivative};
+    volatile struct Point3 result = {x1, y1, y_derivative};
 
     if (x5 - p.X == 0) return result;
     
@@ -285,6 +284,8 @@ struct Point3 get_derivative(struct Point2 p)
     y3 = y4;
     y4 = y5;
     y5 = p.Y;
+    
+    result.Y = y1;
     
     d1y1 = d1y2;
     d1y2 = d1y3;
@@ -306,41 +307,45 @@ struct Point3 get_derivative(struct Point2 p)
     
     y_derivative = (1 / (h * h)) * (d1y1 - (d2y1 / 2) + (d3y1 / 3) - (d4y1/4));
 
-    result.Y = y_derivative;
+    result.Z = y_derivative;
     return result;
 }
 
 void make_calculations()
 {
+    volatile static struct Point3 control_point3_prev = {0.0, 0.0, 0.0};
+    volatile static unsigned char is_in_rush = 0;  // Флаг участка броска тока
+    
     volatile struct Point2 new_point = { control_u, control_i };
     
     volatile struct Point3 current = get_derivative(new_point);
     
-    //if (current.X == 0) return;
+    if (current.X == 0 && current.Y == 0 && current.Z == 0) return;
+    if (control_point3_prev.X == 0 && control_point3_prev.Y == 0 && control_point3_prev.Z == 0) return;
+    if (current.X - control_point3_prev.X == 0) return;
     
     volatile double tan = (current.Y - control_point3_prev.Y) / (current.X - control_point3_prev.X);
     
-    if (fabs(tan) > CONTROL_I_TG_ABS_MIN && !is_in_rush)
-    // Вход на участок броска тока
+    
+    if (fabs(tan) > CONTROL_I_TG_ABS_MIN)
     {
-        control_report_data[control_report_data_i].X = current.Y;
+        if (!is_in_rush)
+        {
+            is_in_rush = 1;
+            control_report_data[control_report_data_i].X = current.Y;
+        }
+        else
+        {
+            if (control_report_data[control_report_data_i].Y < current.Y)
+                control_report_data[control_report_data_i].Y = current.Y;
+        }
     }
-    else if ( fabs(tan) < CONTROL_I_TG_ABS_MIN && is_in_rush )
-    // Выход с участка броска тока
+    else
     {
+        is_in_rush = 0;
         control_report_data[control_report_data_i].Z = current.Y;
         control_report_data_i++;
     }
-    
-    // Установка флага участка броска тока
-    is_in_rush = fabs(tan) > CONTROL_I_TG_ABS_MIN;
-
-    // Если флаг участка броска тока установлен искать локальный максимум первой производной
-    if (is_in_rush)
-    {
-        if (control_report_data[control_report_data_i].Y < current.Y)
-            control_report_data[control_report_data_i].Y = current.Y;
-    }
-    
+     
     control_point3_prev = current;
 }
