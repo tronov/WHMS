@@ -35,7 +35,6 @@ void pwm_proc()
     {
     case PWM_STATE_FIX:
         if (get_message(MSG_PWM_SET)) pwm_state = PWM_STATE_SET;
-        else if (get_message(MSG_PWM_SET_OK)) pwm_state = PWM_STATE_SET;
         break;
     case PWM_STATE_SET:
         pwm_state = PWM_STATE_FIX;
