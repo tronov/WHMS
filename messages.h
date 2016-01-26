@@ -1,5 +1,4 @@
-#ifndef MESSAGES_H_
-#define MESSAGES_H_
+#pragma once
 
 // Messages definitions
 #define MSG_ADC_GET_0           0   // Команда на чтение нулевого канала ЦАП
@@ -40,5 +39,3 @@ void *get_message_param(unsigned char message);
 void send_broadcast_message(unsigned char message);
 
 unsigned char get_broadcast_message(unsigned char message);
-
-#endif /* MESSAGES_H_ */

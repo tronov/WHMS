@@ -1,8 +1,4 @@
-#ifndef UART_H_
-#define UART_H_
+#pragma once
 
 void uart_init(void);
-
 void uart_proc(void);
-
-#endif /* UART_H_ */

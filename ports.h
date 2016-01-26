@@ -1,5 +1,4 @@
-#ifndef PORTS_H_
-#define PORTS_H_
+#pragma once
 
 #include <avr/io.h>
 
@@ -36,5 +35,3 @@
 #define Rel_PIN_N    PIND6
 
 void ports_configure(void);
-
-#endif /* PORTS_H_ */

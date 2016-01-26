@@ -1,5 +1,4 @@
-#ifndef CONTROL_H_
-#define CONTROL_H_
+#pragma once
 
 #include "timer.h"
 
@@ -13,6 +12,3 @@
 
 void control_init(void);
 void control_proc(void);
-
-
-#endif /* CONTROL_H_ */

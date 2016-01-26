@@ -1,5 +1,4 @@
-#ifndef TIMERS_H_
-#define TIMERS_H_
+#pragma once
 
 // Settings
 #define USE_GLOBAL_TIMERS
@@ -40,5 +39,3 @@ void reset_timer(unsigned char timer);
     void pause_gtimer(unsigned char gtimer);
     void resume_gtimer(unsigned char gtimer);
 #endif
-
-#endif /* TIMERS_H_ */

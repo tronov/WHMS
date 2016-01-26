@@ -31,7 +31,7 @@ unsigned char control_state, control_state_prev;
 #define CONTROL_PWM_MIN         0
 #define CONTROL_PWM_MAX         255
 // Минимальный модуль тангенса угла наклона касательной вольт-амперной характеристики (порог чувствительности)
-#define CONTROL_I_TG_ABS_MIN    0.01
+#define CONTROL_I_TG_ABS_MIN    0.02
 // Timeout in ticks (1 tick ~ 0.1 millisecond)
 #define CONTROL_TIMEOUT         (1 * SEC)   // Тайм-аут запуска измерений
 #define CONTROL_TIMEOUT_R_ON    (100 * MS)  // Тайм-аут переходных процессов после подачи напряжения на реле
@@ -65,6 +65,7 @@ volatile unsigned char control_report_data_i = 0;
 void send_report(void);
 struct Point3 get_derivative(struct Point2 p);
 void make_calculations(void);
+void debug(unsigned char *message);
 
 
 // Массив отчета и его индекс
@@ -223,7 +224,8 @@ void control_proc(void)
             send_message(MSG_ADC_GET_1);
             break;
         case CONTROL_STATE_CALCULATE:
-            make_calculations();
+            if (control_report_data_i < CONTROL_RUSHES_MAX)
+                make_calculations();
             break;
         case CONTROL_STATE_RESET_PWM:
             control_pwm = CONTROL_PWM_MIN;
@@ -257,7 +259,7 @@ void send_report()
     report[report_i++] = REP_DELIM;
     
     volatile unsigned char i;    
-    for (i = 0; i < control_report_data_i; i++) // control_report_data_iCONTROL_RUSHES_MAX
+    for (i = 0; i < control_report_data_i; i++)
     {
         dtostrf( control_report_data[i].Y, 1, 5, (char *) &buffer);
         
@@ -288,7 +290,6 @@ void send_report()
     
     send_message_w_param(MSG_UART_TX_START, (unsigned char *) &report);
 }
-
 
 struct Point3 get_derivative(struct Point2 p)
 {
@@ -342,10 +343,6 @@ struct Point3 get_derivative(struct Point2 p)
     
     return result;
 }
-
-
-
-
 
 void make_calculations()
 {
@@ -401,4 +398,18 @@ void make_calculations()
     }
      
     control_point3_prev = current;
+}
+
+void debug(unsigned char *message)
+{
+    for (report_i = 0; *message != REP_EOL && report_i < REP_SIZE; message++)
+    {
+        report[report_i++] = *message;
+    }
+    
+    report[report_i++] = REP_LF;
+    report[report_i++] = REP_CR;
+    report[report_i++] = REP_EOL;
+    
+    send_message_w_param(MSG_UART_TX_START, (unsigned char *) &report);
 }
