@@ -1,6 +1,6 @@
  #include "uart_tx.h"
- 
- #include "control.h"
+ //
+ //#include "control.h"
  
  #include "messages.h"
  
@@ -105,7 +105,7 @@ ISR(USART_TXC_vect)
                 TX.buffer[TX.tail] = *rep_ptr;
                 TX.tail = (TX.tail + 1) & TX_BUFFER_MASK;
                 rep_ptr++;
-            } while (*rep_ptr != REP_EOL);
+            } while (*rep_ptr != '\0');
         
             if(TX.tail != TX.head)
             {
