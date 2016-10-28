@@ -11,7 +11,7 @@ double adc_data;
 #define ADC_STATE_GET_1     2
 #define ADC_STATE_GET_2     3
 
-// Новое и предыдущее состояния
+// Current and previous state
 unsigned char adc_state, adc_state_prev;
 
 void adc_init()

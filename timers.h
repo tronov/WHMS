@@ -3,7 +3,7 @@
 // Settings
 #define USE_GLOBAL_TIMERS
 
-#define MS      10L         // Интервал системного таймера ~0.1 мс
+#define MS      10L         // РРЅС‚РµСЂРІР°Р» СЃРёСЃС‚РµРјРЅРѕРіРѕ С‚Р°Р№РјРµСЂР° ~0.1 РјСЃ
 #define SEC     1000 * MS
 #define MIN     60   * SEC
 #define HOUR    60   * MIN

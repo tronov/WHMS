@@ -1,20 +1,20 @@
 #pragma once
 
 // Messages definitions
-#define MSG_ADC_GET_0           0   // Команда на чтение нулевого канала ЦАП
-#define MSG_ADC_GET_1           1   // Команда на чтение первого канала ЦАП
-#define MSG_ADC_GET_2           2   // Команда на чтение второго канала ЦАП
-#define MSG_ADC_GET_OK          3   // Отчет о выполнении ЦАП
+#define MSG_ADC_GET_0           0   // РљРѕРјР°РЅРґР° РЅР° С‡С‚РµРЅРёРµ РЅСѓР»РµРІРѕРіРѕ РєР°РЅР°Р»Р° Р¦РђРџ
+#define MSG_ADC_GET_1           1   // РљРѕРјР°РЅРґР° РЅР° С‡С‚РµРЅРёРµ РїРµСЂРІРѕРіРѕ РєР°РЅР°Р»Р° Р¦РђРџ
+#define MSG_ADC_GET_2           2   // РљРѕРјР°РЅРґР° РЅР° С‡С‚РµРЅРёРµ РІС‚РѕСЂРѕРіРѕ РєР°РЅР°Р»Р° Р¦РђРџ
+#define MSG_ADC_GET_OK          3   // РћС‚С‡РµС‚ Рѕ РІС‹РїРѕР»РЅРµРЅРёРё Р¦РђРџ
 
 #define MSG_PWM_SET             4
 #define MSG_PWM_SET_ERR         5
 #define MSG_PWM_SET_OK          6
 
-#define MSG_UART_TX_START       7   // Сообщение для UART_TX: Начать передачу
+#define MSG_UART_TX_START       7   // РЎРѕРѕР±С‰РµРЅРёРµ РґР»СЏ UART_TX: РќР°С‡Р°С‚СЊ РїРµСЂРµРґР°С‡Сѓ
 #define MSG_UART_TX_COMPL       8   //
 #define MSG_UART_RX_BYTE_RCV    9
-#define MSG_UART_TX_REARY       10   // Сообщение для CONTROL: UART готов к отправке отчета
-#define MSG_CONTROL_CMD_RCV     11  // Сообщение для CONTROL: Принята команда
+#define MSG_UART_TX_REARY       10  // РЎРѕРѕР±С‰РµРЅРёРµ РґР»СЏ CONTROL: UART РіРѕС‚РѕРІ Рє РѕС‚РїСЂР°РІРєРµ РѕС‚С‡РµС‚Р°
+#define MSG_CONTROL_CMD_RCV     11  // РЎРѕРѕР±С‰РµРЅРёРµ РґР»СЏ CONTROL: РџСЂРёРЅСЏС‚Р° РєРѕРјР°РЅРґР°
 
 #define MESSAGES_NUMBER         12
 
