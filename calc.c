@@ -10,7 +10,7 @@
 volatile struct Point3 control_report_data [CONTROL_RUSHES_MAX];
 volatile unsigned char control_report_data_i = 0;
 
-// Массив отчета и его индекс
+// РњР°СЃСЃРёРІ РѕС‚С‡РµС‚Р° Рё РµРіРѕ РёРЅРґРµРєСЃ
 unsigned char report[REP_SIZE];
 volatile unsigned char report_i;
 
@@ -28,7 +28,7 @@ volatile unsigned char report_i;
     volatile struct Point3 control_point3_prev = {0};
     volatile struct Point2 new_point = {0}, local_max = {0};
     volatile struct Point3 current = {0};
-    volatile unsigned char is_in_rush;  // Флаг участка броска тока
+    volatile unsigned char is_in_rush;  // Р¤Р»Р°Рі СѓС‡Р°СЃС‚РєР° Р±СЂРѕСЃРєР° С‚РѕРєР°
     
     
     
@@ -67,8 +67,8 @@ struct Point3 get_derivative(struct Point2 p)
     
     d4y1 = d3y2 - d3y1;
     
-    // Функция возвращает точку с начала буфера
-    // Восемь итераций на заполнение буфера точек и дельт
+    // Р¤СѓРЅРєС†РёСЏ РІРѕР·РІСЂР°С‰Р°РµС‚ С‚РѕС‡РєСѓ СЃ РЅР°С‡Р°Р»Р° Р±СѓС„РµСЂР°
+    // Р’РѕСЃРµРјСЊ РёС‚РµСЂР°С†РёР№ РЅР° Р·Р°РїРѕР»РЅРµРЅРёРµ Р±СѓС„РµСЂР° С‚РѕС‡РµРє Рё РґРµР»СЊС‚
     if (iter++ < 8) return result;
     
     h = ((x5 - x4) + (x4 - x3) + (x3 - x2) + (x2 - x1)) / 4;
@@ -137,10 +137,10 @@ unsigned char make_calculations(double u,double i)
     
     // --- fabs(i_tan)
     if (i_tan > CONTROL_I_TG_ABS_MIN)
-    // Если текущая точка находится на участке броска тока
+    // Р•СЃР»Рё С‚РµРєСѓС‰Р°СЏ С‚РѕС‡РєР° РЅР°С…РѕРґРёС‚СЃСЏ РЅР° СѓС‡Р°СЃС‚РєРµ Р±СЂРѕСЃРєР° С‚РѕРєР°
     {
         if (!is_in_rush)
-        // Если текущая точка первая на участке броска тока
+        // Р•СЃР»Рё С‚РµРєСѓС‰Р°СЏ С‚РѕС‡РєР° РїРµСЂРІР°СЏ РЅР° СѓС‡Р°СЃС‚РєРµ Р±СЂРѕСЃРєР° С‚РѕРєР°
         {
             is_in_rush = 1;
             control_report_data[control_report_data_i].X = current.Y;
@@ -155,10 +155,10 @@ unsigned char make_calculations(double u,double i)
         }
     }
     else
-    // Если текущая точка не находится на участке броска тока
+    // Р•СЃР»Рё С‚РµРєСѓС‰Р°СЏ С‚РѕС‡РєР° РЅРµ РЅР°С…РѕРґРёС‚СЃСЏ РЅР° СѓС‡Р°СЃС‚РєРµ Р±СЂРѕСЃРєР° С‚РѕРєР°
     {
         if (is_in_rush)
-        // Если текущая точка первая после участка броска тока
+        // Р•СЃР»Рё С‚РµРєСѓС‰Р°СЏ С‚РѕС‡РєР° РїРµСЂРІР°СЏ РїРѕСЃР»Рµ СѓС‡Р°СЃС‚РєР° Р±СЂРѕСЃРєР° С‚РѕРєР°
         {
             control_report_data[control_report_data_i].Y = local_max.X;
             control_report_data[control_report_data_i].Z = current.Y;
@@ -214,9 +214,9 @@ void send_report(double g)
         report[report_i++] = REP_DELIM;
     }
     
-    control_report_data_i = 0;    // Сброс индекса для разблокировки приращения частоты ШИМ
+    control_report_data_i = 0;    // РЎР±СЂРѕСЃ РёРЅРґРµРєСЃР° РґР»СЏ СЂР°Р·Р±Р»РѕРєРёСЂРѕРІРєРё РїСЂРёСЂР°С‰РµРЅРёСЏ С‡Р°СЃС‚РѕС‚С‹ РЁРРњ
 
-    report[report_i]   = REP_LF;  // Подмена последнего символа REP_DELIM
+    report[report_i]   = REP_LF;  // РџРѕРґРјРµРЅР° РїРѕСЃР»РµРґРЅРµРіРѕ СЃРёРјРІРѕР»Р° REP_DELIM
     report[report_i++] = REP_CR;
     report[report_i++] = REP_EOL;
     

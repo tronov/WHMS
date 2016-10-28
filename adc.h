@@ -6,7 +6,7 @@
 
 #define ADC_NUMBER      3
 #define ADC_REFERENCE   5.0
-#define ADC_RESOLUTION  65535//1024
+#define ADC_RESOLUTION  65535 //divider equals 1024
 
 void adc_init(void);
 void adc_proc(void);
